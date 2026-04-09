@@ -1,0 +1,42 @@
+{
+  "name": "dropfileskgpk",
+  "version": "1.0.0",
+  "description": "DropFilesKgpk — Personal file exchange with accounts",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "tsx prisma/seed.ts",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "@supabase/supabase-js": "^2.103.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.8.0",
+    "multiparty": "^4.2.3",
+    "next": "^14.2.35",
+    "next-auth": "^5.0.0-beta.30",
+    "nodemailer": "^7.0.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/multiparty": "^4.2.0",
+    "@types/node": "^25.5.2",
+    "@types/nodemailer": "^8.0.0",
+    "@types/react": "^19.2.14",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.9",
+    "prisma": "^6.19.3",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  }
+}
