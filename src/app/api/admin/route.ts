@@ -30,7 +30,13 @@ export async function GET() {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ users });
+  // Преобразуем BigInt в строку для JSON
+  return NextResponse.json({
+    users: users.map((u) => ({
+      ...u,
+      storageLimit: String(u.storageLimit),
+    })),
+  });
 }
 
 // PATCH — изменить лимит пользователя
