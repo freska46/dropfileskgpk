@@ -43,6 +43,7 @@ export default function FileDashboard() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadingFileName, setUploadingFileName] = useState<string>("");
   const [dragActive, setDragActive] = useState(false);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
@@ -57,6 +58,7 @@ export default function FileDashboard() {
   const [previewFile, setPreviewFile] = useState<FileData | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderInputRef = useRef<HTMLInputElement>(null);
 
   const fetchFiles = useCallback(async () => {
     setLoading(true);
@@ -86,6 +88,7 @@ export default function FileDashboard() {
 
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i];
+      setUploadingFileName(file.name);
       const formData = new FormData();
       formData.append("file", file);
       if (currentFolder) formData.append("folderId", currentFolder);
@@ -98,7 +101,7 @@ export default function FileDashboard() {
 
         const data = await res.json();
         if (!res.ok) {
-          toast.error(data.error || `Ошибка загрузки ${file.name}`);
+          toast.error(`${file.name}: ${data.error}`);
         } else {
           toast.success(`${file.name} загружен`);
         }
@@ -111,6 +114,7 @@ export default function FileDashboard() {
 
     setUploading(false);
     setUploadProgress(0);
+    setUploadingFileName("");
     fetchFiles();
   };
 
@@ -292,7 +296,7 @@ export default function FileDashboard() {
           disabled={uploading}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg font-medium transition-colors text-sm"
         >
-          {uploading ? `⏳ ${uploadProgress.toFixed(0)}%` : "⬆️ Загрузить"}
+          {uploading ? `⏳ ${uploadingFileName}` : "⬆️ Загрузить файлы"}
         </button>
         <input
           ref={fileInputRef}
@@ -303,10 +307,27 @@ export default function FileDashboard() {
         />
 
         <button
+          onClick={() => folderInputRef.current?.click()}
+          disabled={uploading}
+          className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg font-medium transition-colors text-sm"
+        >
+          📁 Загрузить папку
+        </button>
+        <input
+          ref={folderInputRef}
+          type="file"
+          multiple
+          // @ts-ignore — webkitDirectory не в стандартных типах, но работает в браузерах
+          webkitdirectory=""
+          className="hidden"
+          onChange={(e) => e.target.files && uploadFiles(e.target.files)}
+        />
+
+        <button
           onClick={() => setShowNewFolder(true)}
           className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
         >
-          📁 Папка
+          ➕ Новая папка
         </button>
 
         {/* Search */}
