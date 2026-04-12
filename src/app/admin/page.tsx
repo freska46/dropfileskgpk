@@ -128,13 +128,13 @@ export default function AdminPage() {
             <StatCard
               icon="💾"
               label="Занято на сервере"
-              value={formatFileSize(stats.totalStorageUsed)}
+              value={formatFileSize(BigInt(stats.totalStorageUsed))}
               color="blue"
             />
             <StatCard
               icon="📊"
               label="Всего лимит"
-              value={formatFileSize(stats.totalStorageLimit)}
+              value={formatFileSize(BigInt(stats.totalStorageLimit))}
               color="purple"
             />
             <StatCard
@@ -157,7 +157,7 @@ export default function AdminPage() {
           <div className="mb-8 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
             <div className="flex justify-between text-sm text-zinc-400 mb-2">
               <span>Общее хранилище сервера</span>
-              <span>{formatFileSize(stats.totalStorageUsed)} / {formatFileSize(stats.totalStorageLimit)}</span>
+              <span>{formatFileSize(BigInt(stats.totalStorageUsed))} / {formatFileSize(BigInt(stats.totalStorageLimit))}</span>
             </div>
             <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
               <div
@@ -204,7 +204,7 @@ export default function AdminPage() {
                       </span>
                     </td>
                     <td className="px-4 py-3">{user.filesCount || 0}</td>
-                    <td className="px-4 py-3 text-zinc-300">{formatFileSize(user.storageUsed || 0)}</td>
+                    <td className="px-4 py-3 text-zinc-300">{formatFileSize(BigInt(user.storageUsed || 0))}</td>
                     <td className="px-4 py-3">
                       {editingLimit === user.id ? (
                         <div className="flex gap-1">
