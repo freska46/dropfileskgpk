@@ -32,12 +32,27 @@ export const FILE_TYPE_ICONS: Record<string, string> = {
   "audio": "🎵",
   "application/pdf": "📄",
   "application/zip": "📦",
+  "application/x-zip-compressed": "📦",
   "text/plain": "📝",
   "application/msword": "📝",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "📝",
   "application/vnd.ms-excel": "📊",
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "📊",
-  "default": "📁",
+  "application/vnd.rar": "📦",
+  "application/x-rar-compressed": "📦",
+  "application/x-7z-compressed": "📦",
+  "application/gzip": "📦",
+  "application/x-tar": "📦",
+  "text/html": "🌐",
+  "text/css": "🎨",
+  "text/javascript": "⚡",
+  "application/javascript": "⚡",
+  "application/x-python": "🐍",
+  "text/x-python": "🐍",
+  "application/json": "📋",
+  "application/xml": "📋",
+  "application/octet-stream": "📦",
+  "default": "📦",
 };
 
 export function getFileCategory(mimeType: string): string {
@@ -45,6 +60,40 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.startsWith("video/")) return "video";
   if (mimeType.startsWith("audio/")) return "audio";
   return FILE_TYPE_ICONS[mimeType] || "default";
+}
+
+// Получение иконки по расширению (для файлов с неизвестным MIME-типом)
+export function getFileIconByExtension(fileName: string): string {
+  const ext = fileName.toLowerCase().split(".").pop() || "";
+  const iconMap: Record<string, string> = {
+    // Архивы
+    "zip": "📦", "rar": "📦", "7z": "📦", "tar": "📦", "gz": "📦", "bz2": "📦", "xz": "📦",
+    // Документы
+    "pdf": "📄", "doc": "📝", "docx": "📝", "odt": "📝", "rtf": "📝", "txt": "📝",
+    "xls": "📊", "xlsx": "📊", "ods": "📊", "csv": "📊",
+    "ppt": "📽️", "pptx": "📽️", "odp": "📽️",
+    // Код
+    "py": "🐍", "js": "⚡", "ts": "⚡", "html": "🌐", "css": "🎨",
+    "json": "📋", "xml": "📋", "yml": "⚙️", "yaml": "⚙️",
+    "java": "☕", "cpp": "⚡", "c": "⚡", "h": "⚡", "cs": "⚡",
+    "php": "🐘", "rb": "💎", "go": "🔷", "rs": "🦀",
+    // Изображения
+    "jpg": "🖼️", "jpeg": "🖼️", "png": "🖼️", "gif": "🖼️", "webp": "🖼️", "svg": "🖼️",
+    "bmp": "🖼️", "ico": "🖼️", "tiff": "🖼️", "psd": "🎨", "ai": "🎨",
+    // Видео/аудио
+    "mp4": "🎬", "avi": "🎬", "mov": "🎬", "mkv": "🎬", "flv": "🎬", "webm": "🎬",
+    "mp3": "🎵", "wav": "🎵", "flac": "🎵", "ogg": "🎵", "aac": "🎵", "wma": "🎵",
+    // Исполняемые
+    "exe": "💻", "msi": "💻", "dmg": "💻", "apk": "📱", "ipa": "📱",
+    "deb": "📦", "rpm": "📦", "sh": "⚡", "bat": "⚡", "cmd": "⚡",
+    // Базы данных
+    "db": "🗄️", "sql": "🗄️", "sqlite": "🗄️",
+    // Шрифты
+    "ttf": "🔤", "otf": "🔤", "woff": "🔤", "woff2": "🔤",
+    // Другое
+    "iso": "💿", "img": "💿", "torrent": "🔗", "key": "🔑", "pem": "🔑",
+  };
+  return iconMap[ext] || "📦";
 }
 
 // ===================== HELPERS =====================

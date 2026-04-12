@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { formatFileSize, formatDate, getFileCategory } from "@/lib/constants";
+import { formatFileSize, formatDate, getFileCategory, getFileIconByExtension } from "@/lib/constants";
 import { useToast } from "@/components/ToastProvider";
 
 interface FileData {
@@ -493,7 +493,9 @@ function FileCard({
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(file.originalName);
   const isImage = file.mimeType.startsWith("image/");
-  const icon = getFileCategory(file.mimeType);
+  // Если MIME-тип неизвестный — определяем иконку по расширению
+  const isUnknownType = file.mimeType === "application/octet-stream" || !file.mimeType;
+  const icon = isUnknownType ? getFileIconByExtension(file.originalName) : getFileCategory(file.mimeType);
   const accessIcon =
     file.accessType === "PUBLIC" ? "🌐" :
     file.accessType === "LINK_ACCESS" ? "🔗" : "🔒";
@@ -720,9 +722,9 @@ function EmptyState({ search }: { search: string }) {
         Перетащите файлы сюда или нажмите кнопку «Загрузить», чтобы добавить первый файл
       </p>
       <div className="flex gap-3 justify-center text-sm">
-        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">🖼️ Изображения</div>
-        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">📄 Документы</div>
-        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">📦 Архивы</div>
+        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">Любые файлы</div>
+        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">Архивы</div>
+        <div className="px-3 py-1.5 bg-zinc-800 rounded-lg text-zinc-400">Исполняемые</div>
       </div>
     </div>
   );

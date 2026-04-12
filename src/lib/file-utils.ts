@@ -9,23 +9,12 @@ export function validateFile(file: { mimetype: string; originalname: string; siz
   valid: boolean;
   error?: string;
 } {
-  // Проверка размера
+  // Проверка размера (единственное ограничение!)
   if (file.size > MAX_FILE_SIZE) {
     return { valid: false, error: `Файл слишком большой. Максимум ${MAX_FILE_SIZE / 1024 / 1024}МБ` };
   }
 
-  // Проверка MIME-типа
-  if (!ALLOWED_MIME_TYPES[file.mimetype]) {
-    return { valid: false, error: "Неподдерживаемый тип файла" };
-  }
-
-  // Проверка расширения
-  const ext = file.originalname.toLowerCase().split(".").pop() || "";
-  const allowedExts = (ALLOWED_MIME_TYPES as Record<string, string[]>)[file.mimetype] || [];
-  if (!allowedExts.includes(`.${ext}`)) {
-    return { valid: false, error: "Расширение файла не совпадает с типом" };
-  }
-
+  // Принимаем любые файлы — без проверки типа
   return { valid: true };
 }
 
