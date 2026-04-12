@@ -6,6 +6,8 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://dropfileskgpk.vercel.app";
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       {/* Header */}
@@ -39,7 +41,7 @@ export default function PrivacyPage() {
               Настоящая Политика конфиденциальности определяет порядок обработки и защиты
               персональных данных пользователей (далее — «Пользователи») сервиса
               DropFilesKgpk (далее — «Сервис»), расположенного в сети Интернет
-              по адресу: <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-blue-400">http://localhost:3000</code> (далее — «Сайт»).
+              по адресу: <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-blue-400">{siteUrl}</code> (далее — «Сайт»).
             </p>
             <p>
               Сервис DropFilesKgpk (далее — «Оператор») обеспечивает защиту обрабатываемых
@@ -63,8 +65,8 @@ export default function PrivacyPage() {
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-1 text-sm">
               <p><span className="text-zinc-400">Наименование:</span> DropFilesKgpk (DFK)</p>
               <p><span className="text-zinc-400">Тип:</span> Физическое лицо</p>
-              <p><span className="text-zinc-400">Email для обращений:</span> noreply@dfk.local</p>
-              <p><span className="text-zinc-400">Адрес:</span> Российская Федерация</p>
+              <p><span className="text-zinc-400">Email для обращений:</span> freskafreskov@gmail.com</p>
+              <p><span className="text-zinc-400">Адрес:</span> г. Курск, Российская Федерация</p>
             </div>
           </Section>
 
@@ -166,7 +168,7 @@ export default function PrivacyPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-400 mt-0.5">•</span>
-                <span><strong>Отзыв согласия</strong> — отозвать согласие на обработку персональных данных, направив запрос на email: <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-blue-400">noreply@dfk.local</code></span>
+                <span><strong>Отзыв согласия</strong> — отозвать согласие на обработку персональных данных, направив запрос на email: <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-blue-400">freskafreskov@gmail.com</code></span>
               </li>
               <li className="flex gap-2">
                 <span className="text-blue-400 mt-0.5">•</span>
@@ -317,7 +319,7 @@ export default function PrivacyPage() {
               изменения, просматривая актуальную версию по адресу:
             </p>
             <p className="text-blue-400 bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 inline-block">
-              http://localhost:3000/privacy
+              {siteUrl}/privacy
             </p>
             <p className="text-sm text-zinc-400 mt-2">
               При существенных изменениях Оператор может уведомить Пользователей
@@ -332,8 +334,9 @@ export default function PrivacyPage() {
               Пользователь может обратиться:
             </p>
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 space-y-2 text-sm">
-              <p><span className="text-zinc-400">Email:</span> noreply@dfk.local</p>
-              <p><span className="text-zinc-400">Адрес Сайта:</span> http://localhost:3000</p>
+              <p><span className="text-zinc-400">Email:</span> freskafreskov@gmail.com</p>
+              <p><span className="text-zinc-400">Адрес Сайта:</span> {siteUrl}</p>
+              <p><span className="text-zinc-400">Адрес оператора:</span> г. Курск, Российская Федерация</p>
               <p><span className="text-zinc-400">Срок ответа:</span> не более 30 рабочих дней</p>
             </div>
             <p className="text-sm text-zinc-500 mt-4">
