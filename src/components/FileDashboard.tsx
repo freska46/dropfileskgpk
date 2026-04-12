@@ -647,6 +647,14 @@ function AccessModal({
   onRevoke: (linkId: string) => void;
   onClose: () => void;
 }) {
+  // Локальное состояние для мгновенного обновления UI
+  const [localAccessType, setLocalAccessType] = useState(file.accessType);
+
+  const handleSetType = (type: string) => {
+    setLocalAccessType(type);
+    onSetType(file.id, type);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 w-full max-w-lg animate-fadeIn max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -663,9 +671,9 @@ function AccessModal({
             ] as const).map(({ type, icon, label, desc }) => (
               <button
                 key={type}
-                onClick={() => onSetType(file.id, type)}
+                onClick={() => handleSetType(type)}
                 className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left ${
-                  file.accessType === type
+                  localAccessType === type
                     ? "border-blue-500 bg-blue-500/10"
                     : "border-zinc-700 bg-zinc-800/50 hover:bg-zinc-800"
                 }`}
@@ -675,7 +683,7 @@ function AccessModal({
                   <div className="text-sm font-medium">{label}</div>
                   <div className="text-xs text-zinc-400">{desc}</div>
                 </div>
-                {file.accessType === type && (
+                {localAccessType === type && (
                   <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
