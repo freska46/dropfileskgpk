@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// GET — список всех пользователей
+// GET — список всех пользователей + статистика хранилища
 export async function GET() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -26,16 +26,47 @@ export async function GET() {
       _count: {
         select: { files: true },
       },
+      files: {
+        select: {
+          size: true,
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
 
+  // Считаем общую статистику
+  let totalStorageUsed = BigInt(0);
+  let totalStorageLimit = BigInt(0);
+  let totalFiles = 0;
+
+  const usersWithStats = users.map((u) => {
+    const used = u.files.reduce((sum, f) => sum + f.size, BigInt(0));
+    totalStorageUsed += used;
+    totalStorageLimit += u.storageLimit;
+    totalFiles += u._count.files;
+
+    return {
+      id: u.id,
+      email: u.email,
+      name: u.name,
+      role: u.role,
+      storageLimit: String(u.storageLimit),
+      storageUsed: String(used),
+      createdAt: u.createdAt,
+      filesCount: u._count.files,
+    };
+  });
+
   // Преобразуем BigInt в строку для JSON
   return NextResponse.json({
-    users: users.map((u) => ({
-      ...u,
-      storageLimit: String(u.storageLimit),
-    })),
+    users: usersWithStats,
+    stats: {
+      totalStorageUsed: String(totalStorageUsed),
+      totalStorageLimit: String(totalStorageLimit),
+      totalFiles,
+      totalUsers: users.length,
+    },
   });
 }
 

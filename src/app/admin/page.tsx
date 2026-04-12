@@ -13,8 +13,16 @@ interface AdminUser {
   name: string;
   role: string;
   storageLimit: string;
+  storageUsed: string;
   createdAt: string;
-  _count: { files: number };
+  filesCount: number;
+}
+
+interface ServerStats {
+  totalStorageUsed: string;
+  totalStorageLimit: string;
+  totalFiles: number;
+  totalUsers: number;
 }
 
 export default function AdminPage() {
@@ -22,6 +30,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [stats, setStats] = useState<ServerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingLimit, setEditingLimit] = useState<string | null>(null);
@@ -47,6 +56,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error();
       const data = await res.json();
       setUsers(data.users);
+      setStats(data.stats);
     } catch {
       setError("Ошибка загрузки");
     } finally {
@@ -112,6 +122,58 @@ export default function AdminPage() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         {error && <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg p-3">{error}</div>}
 
+        {/* Статистика сервера */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <StatCard
+              icon="💾"
+              label="Занято на сервере"
+              value={formatFileSize(stats.totalStorageUsed)}
+              color="blue"
+            />
+            <StatCard
+              icon="📊"
+              label="Всего лимит"
+              value={formatFileSize(stats.totalStorageLimit)}
+              color="purple"
+            />
+            <StatCard
+              icon="📂"
+              label="Всего файлов"
+              value={stats.totalFiles.toString()}
+              color="green"
+            />
+            <StatCard
+              icon="👥"
+              label="Пользователей"
+              value={stats.totalUsers.toString()}
+              color="orange"
+            />
+          </div>
+        )}
+
+        {/* Прогресс-бар хранилища */}
+        {stats && stats.totalStorageLimit !== "0" && (
+          <div className="mb-8 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+            <div className="flex justify-between text-sm text-zinc-400 mb-2">
+              <span>Общее хранилище сервера</span>
+              <span>{formatFileSize(stats.totalStorageUsed)} / {formatFileSize(stats.totalStorageLimit)}</span>
+            </div>
+            <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  (Number(stats.totalStorageUsed) / Number(stats.totalStorageLimit)) * 100 > 90
+                    ? "bg-red-500"
+                    : (Number(stats.totalStorageUsed) / Number(stats.totalStorageLimit)) * 100 > 70
+                    ? "bg-yellow-500"
+                    : "bg-blue-500"
+                }`}
+                style={{ width: `${(Number(stats.totalStorageUsed) / Number(stats.totalStorageLimit)) * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         <h1 className="text-2xl font-bold mb-6">👥 Пользователи ({users.length})</h1>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
@@ -123,6 +185,7 @@ export default function AdminPage() {
                   <th className="text-left px-4 py-3">Email</th>
                   <th className="text-left px-4 py-3">Роль</th>
                   <th className="text-left px-4 py-3">Файлы</th>
+                  <th className="text-left px-4 py-3">Занято</th>
                   <th className="text-left px-4 py-3">Лимит</th>
                   <th className="text-left px-4 py-3">Создан</th>
                   <th className="text-left px-4 py-3">Действия</th>
@@ -140,7 +203,8 @@ export default function AdminPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-4 py-3">{user._count.files}</td>
+                    <td className="px-4 py-3">{user.filesCount || 0}</td>
+                    <td className="px-4 py-3 text-zinc-300">{formatFileSize(user.storageUsed || 0)}</td>
                     <td className="px-4 py-3">
                       {editingLimit === user.id ? (
                         <div className="flex gap-1">
@@ -186,6 +250,35 @@ export default function AdminPage() {
           </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+// ===================== STAT CARD =====================
+
+function StatCard({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: string;
+  label: string;
+  value: string;
+  color: string;
+}) {
+  const colors: Record<string, string> = {
+    blue: "from-blue-500/20 to-blue-500/5 border-blue-500/20",
+    purple: "from-purple-500/20 to-purple-500/5 border-purple-500/20",
+    green: "from-green-500/20 to-green-500/5 border-green-500/20",
+    orange: "from-orange-500/20 to-orange-500/5 border-orange-500/20",
+  };
+
+  return (
+    <div className={`bg-gradient-to-br ${colors[color]} border rounded-xl p-4 animate-fadeIn`}>
+      <div className="text-2xl mb-1">{icon}</div>
+      <div className="text-lg font-bold">{value}</div>
+      <div className="text-xs text-zinc-400">{label}</div>
     </div>
   );
 }
