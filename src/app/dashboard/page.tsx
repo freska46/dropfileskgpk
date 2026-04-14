@@ -42,8 +42,11 @@ export default function DashboardPage() {
           </div>
 
           <nav className="hidden md:flex items-center gap-4">
-            <Link href="/dashboard" className="px-3 py-1.5 text-sm hover:bg-zinc-800 rounded-lg transition-colors">
+            <Link href="/dashboard" className="px-3 py-1.5 text-sm bg-zinc-800 rounded-lg">
               Файлы
+            </Link>
+            <Link href="/public" className="px-3 py-1.5 text-sm hover:bg-zinc-800 rounded-lg transition-colors">
+              🌐 Лента
             </Link>
             <Link href="/settings" className="px-3 py-1.5 text-sm hover:bg-zinc-800 rounded-lg transition-colors">
               Настройки
@@ -72,8 +75,11 @@ export default function DashboardPage() {
         {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-zinc-800 bg-zinc-900 px-4 py-3 space-y-2 animate-fadeIn">
-            <Link href="/dashboard" className="block px-3 py-2 hover:bg-zinc-800 rounded-lg">
+            <Link href="/dashboard" className="block px-3 py-2 bg-zinc-800 rounded-lg">
               Файлы
+            </Link>
+            <Link href="/public" className="block px-3 py-2 hover:bg-zinc-800 rounded-lg">
+              🌐 Публичная лента
             </Link>
             <Link href="/settings" className="block px-3 py-2 hover:bg-zinc-800 rounded-lg">
               Настройки

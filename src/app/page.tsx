@@ -24,6 +24,12 @@ export default function Home() {
           >
             Регистрация
           </Link>
+          <Link
+            href="/public"
+            className="px-6 py-3 bg-transparent border border-zinc-600 hover:border-zinc-400 rounded-lg font-medium transition-colors"
+          >
+            🌐 Публичная лента
+          </Link>
         </div>
         <div className="mt-12 grid grid-cols-3 gap-6 text-sm text-zinc-500">
           <div>

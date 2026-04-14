@@ -9,18 +9,39 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
-  }
 
   const { id } = await params;
+
+  // Если пользователь авторизован — ищем его файлы
+  if (session?.user?.id) {
+    const file = await prisma.file.findFirst({
+      where: { id, userId: session.user.id },
+      include: { shareLinks: true, folder: true },
+    });
+
+    if (!file) {
+      return NextResponse.json({ error: "Файл не найден" }, { status: 404 });
+    }
+
+    return NextResponse.json({ file });
+  }
+
+  // Если не авторизован — показываем только публичные файлы
   const file = await prisma.file.findFirst({
-    where: { id, userId: session.user.id },
-    include: { shareLinks: true, folder: true },
+    where: { id, accessType: "PUBLIC" },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    },
   });
 
   if (!file) {
-    return NextResponse.json({ error: "Файл не найден" }, { status: 404 });
+    return NextResponse.json({ error: "Файл не найден или недоступен" }, { status: 404 });
   }
 
   return NextResponse.json({ file });
