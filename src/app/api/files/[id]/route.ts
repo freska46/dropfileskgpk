@@ -9,25 +9,10 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-
   const { id } = await params;
 
-  // Если пользователь авторизован — ищем его файлы
-  if (session?.user?.id) {
-    const file = await prisma.file.findFirst({
-      where: { id, userId: session.user.id },
-      include: { shareLinks: true, folder: true },
-    });
-
-    if (!file) {
-      return NextResponse.json({ error: "Файл не найден" }, { status: 404 });
-    }
-
-    return NextResponse.json({ file });
-  }
-
-  // Если не авторизован — показываем только публичные файлы
-  const file = await prisma.file.findFirst({
+  // 1. Сначала проверяем — публичный ли файл
+  const publicFile = await prisma.file.findFirst({
     where: { id, accessType: "PUBLIC" },
     include: {
       user: {
@@ -40,11 +25,24 @@ export async function GET(
     },
   });
 
-  if (!file) {
-    return NextResponse.json({ error: "Файл не найден или недоступен" }, { status: 404 });
+  if (publicFile) {
+    return NextResponse.json({ file: publicFile });
   }
 
-  return NextResponse.json({ file });
+  // 2. Если не публичный — проверяем, владелец ли это
+  if (session?.user?.id) {
+    const file = await prisma.file.findFirst({
+      where: { id, userId: session.user.id },
+      include: { shareLinks: true, folder: true },
+    });
+
+    if (file) {
+      return NextResponse.json({ file });
+    }
+  }
+
+  // 3. Не найден
+  return NextResponse.json({ error: "Файл не найден или недоступен" }, { status: 404 });
 }
 
 // PATCH — переименование / перемещение / смена доступа
