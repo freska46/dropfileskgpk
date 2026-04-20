@@ -1,0 +1,152 @@
+// DropFilesKgpk — Schema базы данных
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===================== USERS =====================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  name          String    @default("")
+  avatarUrl     String?
+  role          Role      @default(USER)
+  storageLimit  BigInt    @default(1073741824) // 1 GB по умолчанию
+  twoFactorEnabled Boolean @default(false)
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Настройки
+  settings      UserSettings?
+
+  // Файлы и папки
+  files         File[]
+  folders       Folder[]
+
+  // Ссылки на шару
+  shareLinks    ShareLink[]
+  accessRequests AccessRequest[] @relation("Requester")
+  receivedRequests AccessRequest[] @relation("Owner")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// ===================== SETTINGS =====================
+
+model UserSettings {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme       Theme    @default(DARK)
+  emailNotifs Boolean  @default(true)
+  language    String   @default("ru")
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}
+
+// ===================== FOLDERS =====================
+
+model Folder {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentId  String?  // вложенные папки
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderHierarchy")
+  files     File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===================== FILES =====================
+
+model File {
+  id              String        @id @default(uuid())
+  originalName    String        // оригинальное имя
+  storedName      String        @unique // UUID на диске
+  mimeType        String
+  size            BigInt
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folderId        String?
+  folder          Folder?       @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  accessType      AccessType    @default(PRIVATE)
+  thumbnailPath   String?       // путь к превью
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  shareLinks      ShareLink[]
+}
+
+enum AccessType {
+  PRIVATE       // только владелец
+  LINK_ACCESS   // доступ по секретной ссылке
+  PUBLIC        // публичный
+}
+
+// ===================== SHARE LINKS =====================
+
+model ShareLink {
+  id          String    @id @default(uuid())
+  token       String    @unique // секретный токен в URL
+  fileId      String
+  file        File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime? // опциональный срок жизни
+  downloads   Int       @default(0)
+  maxDownloads Int?     // null = без лимита
+  createdAt   DateTime  @default(now())
+}
+
+// ===================== ACCESS REQUESTS =====================
+
+model AccessRequest {
+  id          String            @id @default(uuid())
+  fileId      String            // к какому файлу просят доступ
+  requesterId String
+  requester   User              @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  ownerId     String
+  owner       User              @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  message     String?
+  status      RequestStatus     @default(PENDING)
+  createdAt   DateTime          @default(now())
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+// ===================== VERIFICATION CODES =====================
+
+model VerificationCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String   // 6-значный код
+  purpose   CodePurpose
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+enum CodePurpose {
+  EMAIL_VERIFY   // подтверждение email при регистрации
+  TWO_FACTOR     // двухфакторная аутентификация при входе
+}
