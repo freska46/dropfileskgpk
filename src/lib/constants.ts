@@ -1,6 +1,6 @@
 // ===================== CONSTANTS =====================
 
-export const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || "524288000", 10); // 500MB
+export const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || "4000000", 10); // ~4MB
 export const DEFAULT_STORAGE_LIMIT = BigInt(process.env.DEFAULT_STORAGE_LIMIT || "1073741824"); // 1GB
 
 export const ALLOWED_MIME_TYPES: Record<string, string[]> = {
