@@ -5,7 +5,6 @@ import { checkFileAccess } from "@/lib/access-control";
 import { supabaseAdmin, BUCKET_NAME } from "@/lib/supabase";
 import { getFilePath } from "@/lib/file-utils";
 
-// GET — скачивание файла
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -14,8 +13,8 @@ export async function GET(
   const { id } = await params;
   const { searchParams } = new URL(req.url);
   const shareToken = searchParams.get("token") || undefined;
+  const force = searchParams.get("force") === "true";
 
-  // Проверка доступа
   const access = await checkFileAccess(id, session?.user?.id || null, shareToken);
 
   if (!access.allowed) {
@@ -25,7 +24,6 @@ export async function GET(
   const file = access.file!;
   const filePath = getFilePath(file.userId, file.storedName);
 
-  // Получаем файл из Supabase
   const { data, error } = await supabaseAdmin.storage
     .from(BUCKET_NAME)
     .download(filePath);
@@ -36,20 +34,19 @@ export async function GET(
 
   const fileName = file.originalName;
   const contentType = file.mimeType || "application/octet-stream";
+  
   const inlineTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
-  const disposition = inlineTypes.includes(contentType) ? "inline" : "attachment";
+  const disposition = force || !inlineTypes.includes(contentType) ? "attachment" : "inline";
+
+  const arrayBuffer = await data.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
   const headers = new Headers({
     "Content-Disposition": `${disposition}; filename="${encodeURIComponent(fileName)}"`,
     "Content-Type": contentType,
+    "Content-Length": String(buffer.length),
     "Cache-Control": "public, max-age=3600",
   });
-
-  // Конвертируем Blob в буфер
-  const arrayBuffer = await data.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-
-  headers.set("Content-Length", String(buffer.length));
 
   return new NextResponse(buffer, { headers });
 }
