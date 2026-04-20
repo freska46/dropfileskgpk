@@ -56,7 +56,7 @@ export default function PublicFilePage() {
 
   const handleDownload = () => {
     setDownloading(true);
-    window.location.href = `/api/files/${fileId}/download`;
+    window.location.href = `/api/files/${fileId}/download?force=true`;
     setTimeout(() => setDownloading(false), 3000);
   };
 

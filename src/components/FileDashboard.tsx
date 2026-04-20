@@ -574,7 +574,7 @@ function FileCard({
               👁️
             </button>
           )}
-          <a href={`/api/files/${file.id}/download`} target="_blank" className="p-1 hover:bg-zinc-800 rounded text-xs" title="Скачать">
+          <a href={`/api/files/${file.id}/download?force=true`} target="_blank" className="p-1 hover:bg-zinc-800 rounded text-xs" title="Скачать">
             ⬇️
           </a>
           <button onClick={() => setRenaming(true)} className="p-1 hover:bg-zinc-800 rounded text-xs" title="Переименовать">
@@ -602,7 +602,7 @@ function ImagePreviewModal({ file, onClose }: { file: FileData; onClose: () => v
           <h3 className="text-white font-medium truncate max-w-lg">{file.originalName}</h3>
           <div className="flex gap-2">
             <a
-              href={`/api/files/${file.id}/download`}
+              href={`/api/files/${file.id}/download?force=true`}
               target="_blank"
               className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white"
             >

@@ -49,7 +49,7 @@ export default function SharePage() {
 
   const handleDownload = async () => {
     setDownloading(true);
-    window.location.href = `/api/share/${token}/download`;
+    window.location.href = `/api/share/${token}/download?force=true`;
     setTimeout(() => setDownloading(false), 3000);
   };
 

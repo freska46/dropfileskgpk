@@ -10,6 +10,8 @@ export async function GET(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params;
+  const { searchParams } = new URL(req.url);
+  const force = searchParams.get("force") === "true";
 
   const link = await getFileByShareToken(token);
 
@@ -33,16 +35,16 @@ export async function GET(
 
   const contentType = file.mimeType || "application/octet-stream";
   const inlineTypes = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
-  const disposition = inlineTypes.includes(contentType) ? "inline" : "attachment";
+  const disposition = force || !inlineTypes.includes(contentType) ? "attachment" : "inline";
+
+  const arrayBuffer = await data.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
   const headers = new Headers({
     "Content-Disposition": `${disposition}; filename="${encodeURIComponent(file.originalName)}"`,
     "Content-Type": contentType,
+    "Content-Length": String(buffer.length),
   });
-
-  const arrayBuffer = await data.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  headers.set("Content-Length", String(buffer.length));
 
   return new NextResponse(buffer, { headers });
 }
