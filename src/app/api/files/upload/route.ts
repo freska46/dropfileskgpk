@@ -74,8 +74,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ошибка загрузки на сервер" }, { status: 500 });
     }
 
-    // Генерация превью
-    const thumbnailPath = await generateThumbnail(fileBuffer, mimeType, userId, storedName);
+    // Генерация превью (только для картинок)
+    let thumbnailPath = null;
+    try {
+      if (mimeType.startsWith("image/")) {
+        thumbnailPath = await generateThumbnail(fileBuffer, mimeType, userId, storedName);
+      }
+    } catch (e) {
+      console.error("Thumbnail error:", e);
+    }
 
     // Запись в БД
     const dbFile = await prisma.file.create({
